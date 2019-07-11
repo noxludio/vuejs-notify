@@ -1,9 +1,21 @@
 <template>
   <div class="demo">
-    <button @click="notify" class="btn btn-primary mt-2">Notify</button>
-    <button @click="notify" class="btn btn-success mt-2">Notify</button>
-    <button @click="notify" class="btn btn-warning mt-2">Notify</button>
-    <button @click="notify" class="btn btn-danger mt-2">Notify</button>
+
+    <div class="container">
+      <div class="d-flex flex-column justify-content-between" style="height:80vh;">
+        <div class="d-flex justify-content-between">
+          <button @click="notify('top left')" class="btn btn-primary mt-2">Notify</button>
+          <button @click="notify('top center')" class="btn btn-primary mt-2">Notify</button>
+          <button @click="notify('top right')" class="btn btn-primary mt-2">Notify</button>
+        </div>
+        <div class="d-flex justify-content-between">
+          <button @click="notify('bottom left')" class="btn btn-primary mt-2">Notify</button>
+          <button @click="notify('bottom center')" class="btn btn-primary mt-2">Notify</button>
+          <button @click="notify('bottom right')" class="btn btn-primary mt-2">Notify</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -16,10 +28,29 @@ export default {
     }
   },
   methods: {
-    notify(){
+    notify(position){
       this.clicks++
-      this.$notify({msg:"this is test "+this.clicks, timeout:0})
+
+      this.$notify.default({
+        timeout: 0,
+        msg: "lasts forever"
+      })
+
+      // this.$notify.default({
+      //   position,
+      //   title: "Title is here",
+      //   msg: "This is a test message "+this.clicks,
+      //   timeout: 0,
+      //   buttons: [
+      //     { text: "Do it" ,click:(notify)=>{notify.close()}},
+      //     { text: "Cancel", click:(notify)=>{notify.close(),this.notify(position)}, customElement: "<b>STRONG</b>"}
+      //   ]
+      // })
     }
+  },
+  mounted(){
+    console.log(this);
+    
   }
 }
 </script>

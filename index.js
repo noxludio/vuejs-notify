@@ -3,27 +3,71 @@ import Notification from './Notification.vue'
 
 let defaultOptions = {}
 let notifications  = []
-let notifyConstructor = function(){}
-let notify = function(notify){
-  let isString = typeof notify === 'string'
-  let msg      = isString ? notify : notify.msg
 
-  let data = Object.assign({},isString ? { msg } : notify)
-  data = Object.assign(data, defaultOptions)
-  data.notifications = notifications
-
-  const n = new notifyConstructor({data}).$mount()
+let presets = {
+  default: {},
+  warning: {
+    classes: ['warning']
+  },
+  error: {
+    classes: ['error']
+  },
+  success: {
+    classes: ['success']
+  },
+  info: {
+    classes: ['info']
+  },
   
+}
+
+let notifyConstructor = function(){}
+let notifier = function(notify){
+
+  notify = typeof notify === 'string' ? { msg } : notify
+  let options = Object.assign({notifications}, defaultOptions)
+  const n = new notifyConstructor({data: Object.assign(options, notify)}).$mount()
+
   document.body.appendChild(n.$el)
   console.log(n)
 }
 
+let setPreset = function(Vue, name, options) {
+  presets[name] = Object.assign(presets[name]||{}, options)
+  Vue.prototype.$notify[name] = function(notify){
+    let defaults = Object.assign({}, defaultOptions)
+    Object.assign(defaults, presets[name])
+    notifier(Object.assign(defaults, typeof notify === 'string' ? {msg:notify} : notify))
+  }
+}
+
 export default {
-  install(Vue, options) {
+  install(Vue, options = {}) {
     Vue.use(VueTouch)
-    defaultOptions = Object.assign(defaultOptions, options || {})
+    
+    if(options.presets){
+      for (const name in options.presets) {
+        if (options.presets.hasOwnProperty(name)) {
+          presets[name] = Object.assign((presets[name]||{}),options.presets[name])
+        }
+      }
+      delete options.presets
+    }
+
+    Object.assign(defaultOptions, (options||{}) || {})
+
     notifyConstructor = Vue.extend( Notification )
-    Vue.prototype.$notify = notify
+    
+    Vue.prototype.$notify = {}
+
+    Vue.prototype.$notifyPreset = function(name, options){
+      setPreset(Vue,name,options||{})
+      return Vue
+    }
+
+    for (const name in presets) {
+      if (presets.hasOwnProperty(name)) setPreset(Vue, name)
+    }
   }
 }
 

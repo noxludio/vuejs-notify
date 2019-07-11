@@ -5,7 +5,9 @@ import VueNotify from '../../index'
 
 Vue.config.productionTip = false
 
-Vue.use(VueNotify)
+Vue.use(VueNotify,{
+  timeout: 1000
+})
 
 new Vue({
   render: function (h) { return h(App) },
