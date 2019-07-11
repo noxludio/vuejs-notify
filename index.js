@@ -1,27 +1,30 @@
-import Holder from './Holder.vue'
+import VueTouch from 'vue-touch'
 import Notification from './Notification.vue'
 
-let holder = {}
+let defaultOptions = {}
+let notifications  = []
 let notifyConstructor = function(){}
 let notify = function(notify){
   let isString = typeof notify === 'string'
   let msg      = isString ? notify : notify.msg
-  let data     = isString ? { msg } : notify
+
+  let data = Object.assign({},isString ? { msg } : notify)
+  data = Object.assign(data, defaultOptions)
+  data.notifications = notifications
+
   const n = new notifyConstructor({data}).$mount()
-  holder.notifications.push(n)
+  
+  document.body.appendChild(n.$el)
+  console.log(n)
 }
 
 export default {
   install(Vue, options) {
-    options = options || {}
-    const holderConstructor = Vue.extend( Holder )
-    holder = new holderConstructor({
-      data: options
-    }).$mount()
-    document.body.appendChild(holder.$el)
+    Vue.use(VueTouch)
+    defaultOptions = Object.assign(defaultOptions, options || {})
     notifyConstructor = Vue.extend( Notification )
     Vue.prototype.$notify = notify
   }
 }
 
-export { notify as Notify }
+export { notify }
