@@ -127,9 +127,7 @@ export default {
       this.styles.opacity = this.opacity
       this.styles.animation = `${this.appear[this.position]} ${this.transition}ms forwards`
       setTimeout(()=>this.styles.animation=null,this.transition)
-
-      this.styles = Object.assign(this.styles, this.calcPos())
-
+      Object.assign(this.styles, this.calcPos())
       this.notifications
         .filter( item => item.position == this.position )
         .forEach( item => {
@@ -155,6 +153,28 @@ export default {
   color: #292929;
   border: 1px solid rgb(223, 223, 223);
   border-radius: 4px;
+}
+.vue-notification.warning {
+
+  color: #711d1c;
+  background: rgb(255, 224, 151);
+  border: 1px solid rgb(247, 188, 86);
+}
+.vue-notification.error {
+
+  color: #ffffff;
+  background: rgb(218, 75, 75);
+  border: 1px solid transparent;
+}
+.vue-notification.success {
+  color: #152906;
+  background: rgb(27, 232, 54);
+  border: 1px solid #34cc47;;
+}
+.vue-notification.info {
+  color: #ffffff;
+  background: rgb(96, 75, 218);
+  border: 1px solid transparent;
 }
 
 .vue-notification-title {

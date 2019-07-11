@@ -31,7 +31,19 @@ export default {
     notify(position){
       this.clicks++
 
-      this.$notify.default({
+      this.$notify.warning({
+        timeout: 0,
+        msg: "lasts forever"
+      })
+      this.$notify.error({
+        timeout: 0,
+        msg: "lasts forever"
+      })
+      this.$notify.success({
+        timeout: 0,
+        msg: "lasts forever"
+      })
+      this.$notify.info({
         timeout: 0,
         msg: "lasts forever"
       })
