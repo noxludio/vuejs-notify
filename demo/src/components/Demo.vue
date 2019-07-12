@@ -31,22 +31,21 @@ export default {
     notify(position){
       this.clicks++
 
-      this.$notify.warning({
-        timeout: 0,
-        msg: "lasts forever"
-      })
-      this.$notify.error({
-        timeout: 0,
-        msg: "lasts forever"
-      })
-      this.$notify.success({
-        timeout: 0,
-        msg: "lasts forever"
-      })
-      this.$notify.info({
-        timeout: 0,
-        msg: "lasts forever"
-      })
+      let test = {
+        position,
+        title: "Awesome title",
+        msg: "Test message number "+this.clicks,
+        timeout: 500,
+        buttons: [
+          { text: "OK!" }
+        ]
+      }
+
+      this.$notify.default(test)
+      this.$notify.warning(test)
+      this.$notify.error(test)
+      this.$notify.success(test)
+      this.$notify.info(test)
 
       // this.$notify.default({
       //   position,
