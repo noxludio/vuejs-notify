@@ -153,36 +153,65 @@ export default {
   color: #292929;
   border: 1px solid rgb(223, 223, 223);
   border-radius: 4px;
+  --button-background-hover: rgb(236, 236, 236);
+  --button-background-shadow: rgb(236, 236, 236);
+  --title-border-color: rgb(241, 241, 241);
+  --button-background: white;
+  --button-border: 1px solid rgb(190, 189, 189);
+  --button-color: #292929;
 }
 .vue-notification.warning {
-
   color: #711d1c;
   background: rgb(255, 224, 151);
   border: 1px solid rgb(247, 188, 86);
+  --button-background-hover: rgb(247, 188, 86);
+  --button-background-shadow: rgb(247, 188, 86);
+  --title-border-color: rgb(247, 188, 86);
+  --button-background: #ffe3a2;
+  --button-border: 1px solid rgb(208, 159, 76);
+  --button-color: #711d1c;
 }
 .vue-notification.error {
-
   color: #ffffff;
   background: rgb(218, 75, 75);
   border: 1px solid transparent;
+  --button-background-hover: rgb(218, 75, 75);
+  --button-background-shadow: #de5d5d;
+  --title-border-color: rgb(193, 58, 58);
+  --button-background: #de5d5d;
+  --button-border: 1px solid rgb(183, 66, 66);
+  --button-color: white;
 }
 .vue-notification.success {
   color: #152906;
-  background: rgb(27, 232, 54);
-  border: 1px solid #34cc47;;
+  background: rgb(127, 234, 136);
+  border: 1px solid #4fb75c;
+  --button-background-hover: rgb(127, 234, 136);
+  --button-background-shadow: #34cc47;
+  --title-border-color: #34cc47;
+  --button-background: #a4f3aa;
+  --button-border: 1px solid #42a066;
+  --button-color: #2d3f1f;
 }
 .vue-notification.info {
   color: #ffffff;
   background: rgb(96, 75, 218);
   border: 1px solid transparent;
+  --title-border-color: rgb(74, 56, 179);
+  --button-background-hover: rgb(96, 75, 218);
+  --button-background-shadow: #705dde;
+  --button-background: #705dde;
+  --button-border: 1px solid rgb(76, 61, 167);
+  --button-color: white;
 }
 
 .vue-notification-title {
   font-weight: bold;
   padding: 3px 12px;
-  border-bottom: 1px solid rgb(241, 241, 241);
+  border-bottom: 1px solid var(--title-border-color);
   font-size: 12px;
 }
+
 .vue-notification-msg {
   font-size: 13px;
   padding: 5px 12px;
@@ -193,12 +222,21 @@ export default {
   justify-content: flex-end;
 }
 .vue-notification-buttons button {
+  background: var(--button-background);
+  border: var(--button-border);
+  color: var(--button-color);
   font-size: 12px;
-  border: 1px solid rgb(223, 223, 223);
   padding: 2px 6px;
-  background: white;
   border-radius: 4px;
   margin-left: 5px;
+  transition: all .14s ease;
+}
+.vue-notification-buttons button:hover {
+  background: var(--button-background-hover);
+}
+.vue-notification-buttons button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--button-background-shadow);
 }
 
 .vue-notification-buttons button .button-custom-element + span {
