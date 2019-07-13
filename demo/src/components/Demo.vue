@@ -35,17 +35,17 @@ export default {
         position,
         title: "Awesome title",
         msg: "Test message number "+this.clicks,
-        timeout: 500,
+        timeout: 6000,
         buttons: [
           { text: "OK!" }
         ]
       }
 
       this.$notify.default(test)
-      this.$notify.warning(test)
-      this.$notify.error(test)
-      this.$notify.success(test)
-      this.$notify.info(test)
+      // this.$notify.warning(test)
+      // this.$notify.error(test)
+      // this.$notify.success(test)
+      // this.$notify.info(test)
 
       // this.$notify.default({
       //   position,
