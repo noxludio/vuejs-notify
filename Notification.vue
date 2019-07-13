@@ -1,5 +1,5 @@
 <template>
-  <v-touch v-if="mounted" ref="notification" class="vue-notification" :style="c_styles" :class="classes">
+  <v-touch v-if="mounted" ref="notification" class="vue-notification" :style="c_styles" :class="classes" @pan="pan" :pan-options="{ direction: 'horizontal' }">
     <div v-if="title" class="vue-notification-title">{{title}}</div>
     <div v-if="msg" class="vue-notification-msg" v-html="msg"></div>
     <div v-if="component" class="vue-notification-component">
@@ -11,7 +11,6 @@
         <span v-if="button.text">{{button.text}}</span>
       </button>
     </div>
-
   </v-touch>
 </template>
 <script>
@@ -32,6 +31,8 @@ export default {
       componentProps: {},
       component: null,
       buttons: [],
+      temp_transition: null,
+      treshold: 130,
       styles: {
         minWidth: 200,
         maxWidth: 350,
@@ -42,6 +43,7 @@ export default {
         right: null,
         top: null,
         bottom: null,
+        transform: null,
         animation: null,
         pointerEvents: null
       },
@@ -91,9 +93,37 @@ export default {
     },
     center() {
       return (window.innerWidth/2)-(this.$el.clientWidth/2)
+    },
+    isOffScreen(){
+      return this.styles[this.ypos] > window.innerHeight
     }
   },
   methods: {
+    pan(event){
+      // console.log(event)
+
+      if(this.temp_transition === null) {
+        this.temp_transition = this.styles.transition
+      }
+      this.styles.transition = null
+      this.styles.transform = `translateX(${event.deltaX}px)`
+
+      if(event.isFinal){
+        this.styles.transition = this.temp_transition
+        this.temp_transition = null
+        let target = 0
+        if(Math.abs(event.deltaX) > this.treshold) {
+          target = event.deltaX > 0 ? 200 : -200
+          this.close()
+        }
+        
+        setTimeout(()=>{
+          this.styles.transform = `translateX(${target}px)`
+        },1)
+      }
+      
+
+    },
     calcPos(){
       let pos = {}
       let yx = this.position.split(' ')
@@ -112,7 +142,7 @@ export default {
         .forEach( item => {
           item.styles[this.ypos] -= this.$el.clientHeight + this.marginY
       })
-      setTimeout(()=>{
+      this.$nextTick(()=>{
         this.notifications = this.notifications.filter( item => item._uid != this._uid )
         this.$destroy()
         this.$el.parentNode.removeChild(this.$el);
@@ -128,11 +158,13 @@ export default {
       this.styles.animation = `${this.appear[this.position]} ${this.transition}ms forwards`
       setTimeout(()=>this.styles.animation=null,this.transition)
       Object.assign(this.styles, this.calcPos())
+
       this.notifications
         .filter( item => item.position == this.position )
         .forEach( item => {
           item.styles[this.ypos] += this.$el.clientHeight + this.marginY
-        })
+          // if(item.isOffScreen) item.close()
+      })
 
       this.notifications.unshift(this)
     })

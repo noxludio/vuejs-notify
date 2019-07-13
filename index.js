@@ -29,7 +29,7 @@ let notifier = function(notify){
   const n = new notifyConstructor({data: Object.assign(options, notify)}).$mount()
 
   document.body.appendChild(n.$el)
-  console.log(n)
+  // console.log(n)
 }
 
 let setPreset = function(Vue, name, options) {
