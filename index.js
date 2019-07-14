@@ -1,6 +1,7 @@
 import VueTouch from 'vue-touch'
 import Notification from './Notification.vue'
 
+let container = null
 let defaultOptions = {}
 let notifications  = []
 
@@ -23,13 +24,21 @@ let presets = {
 
 let notifyConstructor = function(){}
 let notifier = function(notify){
+  
+  if(!container) {
+    return console.warn("vue-touch-notify was not installed properly. Container was not set.")
+  }
 
   notify = typeof notify === 'string' ? { msg } : notify
   let options = Object.assign({notifications}, defaultOptions)
-  const n = new notifyConstructor({data: Object.assign(options, notify)}).$mount()
+  const notifyComponent = new notifyConstructor({data: Object.assign(options, notify)}).$mount()
+  container.appendChild(notifyComponent.$el)
+  
+  return notifyComponent
 
-  document.body.appendChild(n.$el)
-  // console.log(n)
+  // if(defaultOptions.returnPromise) {
+  // } else return notifyComponent
+
 }
 
 let setPreset = function(Vue, name, options) {
@@ -37,7 +46,11 @@ let setPreset = function(Vue, name, options) {
   Vue.prototype.$notify[name] = function(notify){
     let defaults = Object.assign({}, defaultOptions)
     Object.assign(defaults, presets[name])
-    notifier(Object.assign(defaults, typeof notify === 'string' ? {msg:notify} : notify))
+    const notifyComponent = notifier(Object.assign(defaults, typeof notify === 'string' ? {msg:notify} : notify))
+
+    return new Promise( (resolve, reject) => {
+      notifyComponent.on('mounted', resolve)
+    })
   }
 }
 
@@ -53,6 +66,9 @@ export default {
       }
       delete options.presets
     }
+    container = document.createElement('div')
+    container.classList.add('vue-touch-notify-container')
+    document.body.appendChild(container)
 
     Object.assign(defaultOptions, (options||{}) || {})
 
