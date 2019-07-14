@@ -33,19 +33,29 @@ export default {
 
       let test = {
         position,
-        title: "Awesome title",
-        msg: "Test message number "+this.clicks,
+        title: "Title",
+        msg: "Hey something happened",
         timeout: 6000,
+        timeout: 0,
+        transition: 350,
         buttons: [
-          { text: "OK!" }
+          { text: "OK!", click(notify){ notify.close() } }
         ]
       }
 
-      this.$notify.default(test)
+      // this.$notify.default(test)
       // this.$notify.warning(test)
       // this.$notify.error(test)
       // this.$notify.success(test)
-      // this.$notify.info(test)
+      this.$notify.info(test).then( notify => {
+        notify.on('before-close', function(){
+          console.log('BEFORE CLOSE EVENT');
+        })
+        notify.on('click', function(notify, event){
+          console.log('CLICK EVENT', notify, event);
+          notify.close()
+        })
+      })
 
       // this.$notify.default({
       //   position,
