@@ -1,15 +1,17 @@
 <template>
-  <v-touch v-if="mounted" ref="notification" class="vue-notification" :style="c_styles" :class="classes" @pan="pan" :pan-options="{ direction: 'horizontal' }">
-    <div v-if="title" class="vue-notification-title">{{title}}</div>
-    <div v-if="msg" class="vue-notification-msg" v-html="msg"></div>
-    <div v-if="component" class="vue-notification-component">
-      <component :is="component" v-bind="componentProps" />
-    </div>
-    <div v-if="c_buttons && c_buttons.length > 0" class="vue-notification-buttons">
-      <button v-for="button in c_buttons" :key="button.uid" @click="button._click">
-        <span class="button-custom-element" v-if="button.customElement" v-html="button.customElement"></span>
-        <span v-if="button.text">{{button.text}}</span>
-      </button>
+  <v-touch v-if="mounted"  ref="notification" class="vue-notification" :style="c_styles" :class="classes" @pan="pan" :pan-options="{ direction: 'horizontal' }">
+    <div @click="notifyClicked">
+      <div v-if="title"  class="vue-notification-title" v-html="title"></div>
+      <div v-if="msg" class="vue-notification-msg" v-html="msg"></div>
+      <div v-if="component" class="vue-notification-component">
+        <component :is="component" v-bind="componentProps" />
+      </div>
+      <div v-if="c_buttons && c_buttons.length > 0" class="vue-notification-buttons">
+        <button v-for="button in c_buttons" :key="button.uid" @click="(button[_uid+'_click']||noop)()">
+          <span class="button-custom-element" v-if="button.html" v-html="button.html"></span>
+          <span v-if="button.text">{{button.text}}</span>
+        </button>
+      </div>
     </div>
   </v-touch>
 </template>
@@ -27,12 +29,15 @@ export default {
       marginX: 20,
       notifications: [],
       mounted: false,
-      opacity: 0.9,
+      opacity: 1,
       componentProps: {},
       component: null,
       buttons: [],
-      temp_transition: null,
+      compButtons: [],
       treshold: 130,
+      holding: false,
+      temp_transition: null,
+      timeout_ended: false,
       styles: {
         minWidth: 200,
         maxWidth: 350,
@@ -56,17 +61,13 @@ export default {
         'bottom center':'fromBottom',
       },
       events: {
-        close: [],
-        mounted: []
+        'before-close': [],
+        mounted: [],
+        click: []
       }
     }
   },
   computed: {
-    fire(event, args){
-      this.events[event]
-      .filter( fn => typeof fn == 'function' )
-      .forEach( fn => fn.apply(this, args) )
-    },
     ypos(){
       return this.position.split(" ")[0]
     },
@@ -75,8 +76,8 @@ export default {
       if(Array.isArray(this.buttons)){
         this.buttons.forEach( (btn,index) => { 
           btn.uid = btn.uid || Date.now()+index
-          btn._click = (event) => {
-            (btn.click || function(){}).apply(this, [this, event])
+          btn[this._uid+'_click'] = (event) => {
+            (btn.click || function(){}).apply(this, [this, event, btn])
           }
         })
         return this.buttons
@@ -99,6 +100,21 @@ export default {
     }
   },
   methods: {
+    notifyClicked(clickEvent){
+      this.fire('click', [this, clickEvent])
+    },
+    fire(eventName, args){
+
+      args = Array.isArray(args) ? args : [args]
+
+      this.events[eventName]
+      .filter( fn => typeof fn == 'function' )
+      .forEach( fn => fn.apply(this, args) )
+    },
+    on(eventName, fn){
+      this.events[eventName].push(fn)
+    },
+    noop(){},
     pan(event){
       // console.log(event)
 
@@ -107,18 +123,26 @@ export default {
       }
       this.styles.transition = null
       this.styles.transform = `translateX(${event.deltaX}px)`
+      this.holding = true
 
       if(event.isFinal){
+
+        this.holding = false
+
+
         this.styles.transition = this.temp_transition
         this.temp_transition = null
         let target = 0
+        
+        if(this.timeout_ended) this.close()
+
         if(Math.abs(event.deltaX) > this.treshold) {
-          target = event.deltaX > 0 ? 200 : -200
+          target = event.deltaX > 0 ? 100 : -100
           this.close()
         }
         
         setTimeout(()=>{
-          this.styles.transform = `translateX(${target}px)`
+          this.styles.transform = `translateX(${target}%)`
         },1)
       }
       
@@ -134,6 +158,9 @@ export default {
       return pos
     },
     close(){
+
+      this.fire('before-close', this)
+
       this.styles.opacity = 0
       this.styles.pointerEvents = 'none'
       let index = this.notifications.findIndex( n => n._uid == this._uid)
@@ -142,10 +169,10 @@ export default {
         .forEach( item => {
           item.styles[this.ypos] -= this.$el.clientHeight + this.marginY
       })
-      this.$nextTick(()=>{
+      setTimeout(()=>{
         this.notifications = this.notifications.filter( item => item._uid != this._uid )
         this.$destroy()
-        this.$el.parentNode.removeChild(this.$el);
+        this.$el.remove();
       },this.transition)
     }
   },
@@ -154,6 +181,7 @@ export default {
     this.styles.opacity = 0
     this.mounted = true;
     this.$nextTick( () => {
+      this.fire('mounted', this)
       this.styles.opacity = this.opacity
       this.styles.animation = `${this.appear[this.position]} ${this.transition}ms forwards`
       setTimeout(()=>this.styles.animation=null,this.transition)
@@ -166,12 +194,19 @@ export default {
           // if(item.isOffScreen) item.close()
       })
 
+      if(this.notifications.length > 40) {
+        let overflow = this.notifications.pop()
+        overflow.$destroy()
+        if(overflow.$el) overflow.$el.remove();
+      }
+
       this.notifications.unshift(this)
     })
 
     if(this.timeout && this.timeout > 0) {
       setTimeout(()=>{
-        this.close()
+        this.timeout_ended = true
+        if(!this.holding) this.close()
       }, this.timeout)
     }
   }
@@ -215,15 +250,15 @@ export default {
   --button-color: white;
 }
 .vue-notification.success {
-  color: #152906;
-  background: rgb(127, 234, 136);
-  border: 1px solid #4fb75c;
-  --button-background-hover: rgb(127, 234, 136);
-  --button-background-shadow: #34cc47;
-  --title-border-color: #34cc47;
-  --button-background: #a4f3aa;
-  --button-border: 1px solid #42a066;
-  --button-color: #2d3f1f;
+  color: white;
+  background: rgb(78, 189, 114);
+  border: 1px solid #63b76e;
+  --button-background-hover: rgb(93, 220, 134);
+  --button-background-shadow: rgb(93, 220, 134);
+  --title-border-color: #40ab63;
+  --button-background: #53ce7b;
+  --button-border: 1px solid #3f9c63;
+  --button-color: #ffffff;
 }
 .vue-notification.info {
   color: #ffffff;
