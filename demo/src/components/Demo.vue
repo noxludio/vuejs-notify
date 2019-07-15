@@ -32,30 +32,12 @@ export default {
       this.clicks++
 
       let test = {
-        position,
-        title: "Title",
-        msg: "Hey something happened",
-        timeout: 6000,
-        timeout: 0,
-        transition: 350,
-        buttons: [
-          { text: "OK!", click(notify){ notify.close() } }
-        ]
+        position
       }
 
-      // this.$notify.default(test)
-      // this.$notify.warning(test)
-      // this.$notify.error(test)
-      // this.$notify.success(test)
-      this.$notify.info(test).then( notify => {
-        notify.on('before-close', function(){
-          console.log('BEFORE CLOSE EVENT');
-        })
-        notify.on('click', function(notify, event){
-          console.log('CLICK EVENT', notify, event);
-          notify.close()
-        })
-      })
+      this.$notify.myNotify(test)
+      
+      
 
       // this.$notify.default({
       //   position,
@@ -71,7 +53,39 @@ export default {
   },
   mounted(){
     console.log(this);
-    
+    this.$notifyPreset('myNotify', {
+      classes: ["my-custom-notify"],
+      msg: "Default",
+      title: "Default",
+      timeout: 0,
+      transition: 350,
+      closeOnClick: false,
+      buttons: [
+        { text: "OK!",
+          click(notify){
+            this.classes = 'warning'
+            this.opacity = 1
+            this.title = "Success!"
+            this.buttons = [{
+              text: 'Close',
+              click(n) {
+                n.close(true)
+              }
+            }]
+            // setTimeout( () => {
+            //   notify.close()
+            // }, 1400)
+          }
+        }
+      ]
+    })
+    .$notify.myNotify({marginY: window.innerHeight/2 }).then( notify => {
+      notify.on('before-close', function(n){
+        console.log('BEFORE CLOSE EVENT', this);
+        this.preventClose = true
+
+      })
+    })
   }
 }
 </script>
