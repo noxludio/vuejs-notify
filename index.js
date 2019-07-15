@@ -34,6 +34,12 @@ let notifier = function(notify){
   const notifyComponent = new notifyConstructor({data: Object.assign(options, notify)}).$mount()
   container.appendChild(notifyComponent.$el)
   
+  if(notifications.length > (defaultOptions.max||60)) {
+    let overflow = notifications.pop()
+    overflow.$destroy()
+    if(overflow.$el) overflow.$el.remove();
+  }
+
   return notifyComponent
 
   // if(defaultOptions.returnPromise) {
@@ -78,7 +84,10 @@ export default {
 
     Vue.prototype.$notifyPreset = function(name, options){
       setPreset(Vue,name,options||{})
-      return Vue
+      return this
+    }
+    Vue.prototype.$getNotifyPresets = function(){
+      return presets
     }
 
     for (const name in presets) {
