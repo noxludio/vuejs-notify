@@ -1,13 +1,13 @@
 <template>
-  <v-touch v-if="mounted"  ref="notification" class="vue-notification" :style="c_styles" :class="classes" @pan="pan" :pan-options="{ direction: 'horizontal' }">
+  <v-touch v-if="mounted"  ref="notification" class="vue-notification" :style="c_styles" :class="classes" @pan="pan" :pan-options="{ direction: 'horizontal', treshold: 10 }">
     <div @click="notifyClicked">
-      <div v-if="title"  class="vue-notification-title" v-html="title"></div>
+      <div v-if="title"  class="vue-notification-title" v-html="title" :style="`transition: border ${transition}ms ease`"></div>
       <div v-if="msg" class="vue-notification-msg" v-html="msg"></div>
       <div v-if="component" class="vue-notification-component">
         <component :is="component" v-bind="componentProps" />
       </div>
       <div v-if="c_buttons && c_buttons.length > 0" class="vue-notification-buttons">
-        <button v-for="button in c_buttons" :key="button.uid" @click="(button[_uid+'_click']||noop)()">
+        <button v-for="button in c_buttons" :class="button.classes" :key="button.uid" @click="(button[_uid+'_click']||noop)()">
           <span class="button-custom-element" v-if="button.html" v-html="button.html"></span>
           <span v-if="button.text">{{button.text}}</span>
         </button>
@@ -33,11 +33,14 @@ export default {
       componentProps: {},
       component: null,
       buttons: [],
+      preventClose: false,
+      closeOnClick: false,
       compButtons: [],
-      treshold: 130,
+      treshold: 100,
       holding: false,
       temp_transition: null,
       timeout_ended: false,
+      close_running: false,
       styles: {
         minWidth: 200,
         maxWidth: 350,
@@ -77,6 +80,9 @@ export default {
         this.buttons.forEach( (btn,index) => { 
           btn.uid = btn.uid || Date.now()+index
           btn[this._uid+'_click'] = (event) => {
+
+            console.log(this._uid+'_click', btn);
+
             (btn.click || function(){}).apply(this, [this, event, btn])
           }
         })
@@ -93,6 +99,7 @@ export default {
       return styles
     },
     center() {
+      return `calc(50vw - ${(this.$el.clientWidth/2)}px)`
       return (window.innerWidth/2)-(this.$el.clientWidth/2)
     },
     isOffScreen(){
@@ -101,7 +108,9 @@ export default {
   },
   methods: {
     notifyClicked(clickEvent){
+      if(this.holding) return
       this.fire('click', [this, clickEvent])
+      if(this.closeOnClick) this.close()
     },
     fire(eventName, args){
 
@@ -116,68 +125,68 @@ export default {
     },
     noop(){},
     pan(event){
-      // console.log(event)
-
       if(this.temp_transition === null) {
         this.temp_transition = this.styles.transition
       }
+
       this.styles.transition = null
       this.styles.transform = `translateX(${event.deltaX}px)`
       this.holding = true
-
-      if(event.isFinal){
-
+      if(event.isFinal) {
         this.holding = false
-
-
         this.styles.transition = this.temp_transition
         this.temp_transition = null
-        let target = 0
-        
         if(this.timeout_ended) this.close()
-
         if(Math.abs(event.deltaX) > this.treshold) {
-          target = event.deltaX > 0 ? 100 : -100
-          this.close()
+          let target = event.deltaX + (event.deltaX > 0 ? 100 : -100)
+          this.styles.transform = `translateX(${(this.close() ? target : 0)}px)`
+        } else {
+          this.styles.transform = null
         }
-        
-        setTimeout(()=>{
-          this.styles.transform = `translateX(${target}%)`
-        },1)
       }
-      
-
     },
-    calcPos(){
+    startingPos(){
       let pos = {}
       let yx = this.position.split(' ')
-      let x = yx[1] === 'center' ? 'left' : yx[1]
-      let y = yx[0]
+      let x = yx[1] === 'center' ? 'left' : yx[1] // x = left or right
+      let y = yx[0] //  y = top or bottom
       pos[y] = this.marginY
       pos[x] = yx[1] === 'center' ? this.center : this.marginX
       return pos
     },
-    close(){
-
+    close(forced){
+      
+      if(this.close_running) return false
+      else this.close_running = true
+      
       this.fire('before-close', this)
+
+      if(!forced && this.preventClose) {
+        this.preventClose = this.close_running = false
+        return false
+      }
 
       this.styles.opacity = 0
       this.styles.pointerEvents = 'none'
       let index = this.notifications.findIndex( n => n._uid == this._uid)
+      
       this.notifications.slice(index)
-        .filter( item => item.position == this.position )
+        .filter( item => item._uid !== this._uid && item.position == this.position )
         .forEach( item => {
           item.styles[this.ypos] -= this.$el.clientHeight + this.marginY
       })
+      
       setTimeout(()=>{
         this.notifications = this.notifications.filter( item => item._uid != this._uid )
         this.$destroy()
         this.$el.remove();
       },this.transition)
+
+      return true
     }
   },
   mounted(){
-    this.styles.transition = `all ${this.transition}ms ease`
+    this.styles.transition = `all ${this.transition}ms ease, left 0s`
     this.styles.opacity = 0
     this.mounted = true;
     this.$nextTick( () => {
@@ -185,21 +194,13 @@ export default {
       this.styles.opacity = this.opacity
       this.styles.animation = `${this.appear[this.position]} ${this.transition}ms forwards`
       setTimeout(()=>this.styles.animation=null,this.transition)
-      Object.assign(this.styles, this.calcPos())
+      Object.assign(this.styles, this.startingPos())
 
       this.notifications
         .filter( item => item.position == this.position )
         .forEach( item => {
           item.styles[this.ypos] += this.$el.clientHeight + this.marginY
-          // if(item.isOffScreen) item.close()
       })
-
-      if(this.notifications.length > 40) {
-        let overflow = this.notifications.pop()
-        overflow.$destroy()
-        if(overflow.$el) overflow.$el.remove();
-      }
-
       this.notifications.unshift(this)
     })
 
@@ -208,6 +209,14 @@ export default {
         this.timeout_ended = true
         if(!this.holding) this.close()
       }, this.timeout)
+    }
+  },
+  watch: {
+    opacity(val){
+      this.styles.opacity = val
+    },
+    transition(val){
+      this.styles.transition = `all ${val}ms ease, left 0s`
     }
   }
   
@@ -253,7 +262,7 @@ export default {
   color: white;
   background: rgb(78, 189, 114);
   border: 1px solid #63b76e;
-  --button-background-hover: rgb(93, 220, 134);
+  --button-background-hover: rgb(78, 189, 114);
   --button-background-shadow: rgb(93, 220, 134);
   --title-border-color: #40ab63;
   --button-background: #53ce7b;
