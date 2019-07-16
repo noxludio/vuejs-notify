@@ -1,21 +1,25 @@
 <template>
   <div class="demo">
-
-    <div class="container">
-      <div class="d-flex flex-column justify-content-between" style="height:80vh;">
-        <div class="d-flex justify-content-between">
-          <button @click="notify('top left')" class="btn btn-primary mt-2">Notify</button>
-          <button @click="notify('top center')" class="btn btn-primary mt-2">Notify</button>
-          <button @click="notify('top right')" class="btn btn-primary mt-2">Notify</button>
-        </div>
-        <div class="d-flex justify-content-between">
-          <button @click="notify('bottom left')" class="btn btn-primary mt-2">Notify</button>
-          <button @click="notify('bottom center')" class="btn btn-primary mt-2">Notify</button>
-          <button @click="notify('bottom right')" class="btn btn-primary mt-2">Notify</button>
+    <div class="first-block">
+      <div class="container">
+        <div class="d-flex flex-column justify-content-between" style="height:80vh;">
+          <div class="d-flex justify-content-between">
+            <button @click="notify1('top left')" class="btn btn-primary mt-2">Notify</button>
+            <button @click="notify1('top center')" class="btn btn-primary mt-2">Notify</button>
+            <button @click="notify1('top right')" class="btn btn-primary mt-2">Notify</button>
+          </div>
+          <div>
+            <h2>vue-touch-notify</h2>
+            <code>npm i --save vue-touch-notify</code>
+          </div>
+          <div class="d-flex justify-content-between">
+            <button @click="notify1('bottom left')" class="btn btn-primary mt-2">Notify</button>
+            <button @click="notify1('bottom center')" class="btn btn-primary mt-2">Notify</button>
+            <button @click="notify1('bottom right')" class="btn btn-primary mt-2">Notify</button>
+          </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -23,76 +27,50 @@
 export default {
   name: 'Demo',
   data(){
-    return {
-      clicks: 0
-    }
+    return {}
   },
   methods: {
-    notify(position){
-      this.clicks++
+    notify1(position){
 
       let test = {
-        position
+        position,
+        msg: "To be able to close this you need to do it 'Do it'",
+        timeout: 0,
+        styles:{
+          minWidth: 250,
+          maxWidth: 250
+        },
+        buttons: [
+          { text: "Do it" ,
+            click:(notify)=>{
+              notify.classes = 'success'
+              notify.msg = 'Nice! Now you can close this notification'
+              notify.buttons = [{
+                text: "Close",
+                click(){
+                  notify.close(true)
+                }
+              }]
+            }
+          },
+        ]
       }
 
-      this.$notify.myNotify(test)
-      
-      
+      this.$notify.default(test).then( notify => {
+        notify.on("before-close", function(){
+          if(this.classes != 'success') this.preventClose = true
+        })
+      })
 
-      // this.$notify.default({
-      //   position,
-      //   title: "Title is here",
-      //   msg: "This is a test message "+this.clicks,
-      //   timeout: 0,
-      //   buttons: [
-      //     { text: "Do it" ,click:(notify)=>{notify.close()}},
-      //     { text: "Cancel", click:(notify)=>{notify.close(),this.notify(position)}, customElement: "<b>STRONG</b>"}
-      //   ]
-      // })
     }
   },
-  mounted(){
-    console.log(this);
-    this.$notifyPreset('myNotify', {
-      classes: ["my-custom-notify"],
-      msg: "Default",
-      title: "Default",
-      timeout: 0,
-      transition: 350,
-      closeOnClick: false,
-      buttons: [
-        { text: "OK!",
-          click(notify){
-            this.classes = 'warning'
-            this.opacity = 1
-            this.title = "Success!"
-            this.buttons = [{
-              text: 'Close',
-              click(n) {
-                n.close(true)
-              }
-            }]
-            // setTimeout( () => {
-            //   notify.close()
-            // }, 1400)
-          }
-        }
-      ]
-    })
-    .$notify.myNotify({marginY: window.innerHeight/2 }).then( notify => {
-      notify.on('before-close', function(n){
-        console.log('BEFORE CLOSE EVENT', this);
-        this.preventClose = true
-
-      })
-    })
-  }
+  mounted(){}
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.demo{
+.first-block {
   position: fixed;
   height: 100vh;
   width: 100vw;
