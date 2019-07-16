@@ -18,33 +18,23 @@ let presets = {
   },
   info: {
     classes: ['info']
-  },
-  
+  }
 }
 
 let notifyConstructor = function(){}
 let notifier = function(notify){
-  
   if(!container) {
     return console.warn("vue-touch-notify was not installed properly. Container was not set.")
   }
-
-  notify = typeof notify === 'string' ? { msg } : notify
   let options = Object.assign({notifications}, defaultOptions)
   const notifyComponent = new notifyConstructor({data: Object.assign(options, notify)}).$mount()
   container.appendChild(notifyComponent.$el)
-  
   if(notifications.length > (defaultOptions.max||60)) {
     let overflow = notifications.pop()
     overflow.$destroy()
     if(overflow.$el) overflow.$el.remove();
   }
-
   return notifyComponent
-
-  // if(defaultOptions.returnPromise) {
-  // } else return notifyComponent
-
 }
 
 let setPreset = function(Vue, name, options) {
@@ -53,7 +43,6 @@ let setPreset = function(Vue, name, options) {
     let defaults = Object.assign({}, defaultOptions)
     Object.assign(defaults, presets[name])
     const notifyComponent = notifier(Object.assign(defaults, typeof notify === 'string' ? {msg:notify} : notify))
-
     return new Promise( (resolve, reject) => {
       notifyComponent.on('mounted', resolve)
     })
