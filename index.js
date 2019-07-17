@@ -82,6 +82,7 @@ export default {
     for (const name in presets) {
       if (presets.hasOwnProperty(name)) setPreset(Vue, name)
     }
+
   }
 }
 
