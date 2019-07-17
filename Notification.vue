@@ -27,23 +27,23 @@ export default {
       transition: 330,
       marginY: 10,
       marginX: 20,
+      opacity: 1,
+      buttons: [],
+      touch: true,
       notifications: [],
       mounted: false,
-      opacity: 1,
       componentProps: {},
       component: null,
-      buttons: [],
       preventClose: false,
       closeOnClick: false,
-      compButtons: [],
       treshold: 100,
       holding: false,
       temp_transition: null,
       timeout_ended: false,
       close_running: false,
       styles: {
-        minWidth: 200,
-        maxWidth: 350,
+        minWidth: 250,
+        maxWidth: 300,
         width: null,
         transition: null,
         opacity: null,
@@ -56,17 +56,18 @@ export default {
         pointerEvents: null
       },
       appear: {
-        'top left':'fromLeft',
-        'top right':'fromRight',
-        'top center':'fromTop',
-        'bottom left':'fromLeft',
-        'bottom right':'fromRight',
-        'bottom center':'fromBottom',
+        'top left':'NotifyFromLeft',
+        'top right':'NotifyFromRight',
+        'top center':'NotifyFromTop',
+        'bottom left':'NotifyFromLeft',
+        'bottom right':'NotifyFromRight',
+        'bottom center':'NotifyFromBottom',
       },
       events: {
         'before-close': [],
-        mounted: [],
-        click: []
+        'mounted': [],
+        'closed': [],
+        'click': []
       }
     }
   },
@@ -125,6 +126,8 @@ export default {
     },
     noop(){},
     pan(event){
+      if(!this.touch) { return }
+
       if(this.temp_transition === null) {
         this.temp_transition = this.styles.transition
       }
@@ -182,6 +185,8 @@ export default {
         this.$el.remove();
       },this.transition)
 
+      this.fire('closed', this)
+
       return true
     }
   },
@@ -223,12 +228,16 @@ export default {
 }
 </script>
 <style>
+body {
+  overflow-x: hidden;
+}
 .vue-notification {
   position: fixed;
   background: white;
   color: #292929;
   border: 1px solid rgb(223, 223, 223);
   border-radius: 4px;
+  z-index: 1000;
   --button-background-hover: rgb(236, 236, 236);
   --button-background-shadow: rgb(236, 236, 236);
   --title-border-color: rgb(241, 241, 241);
@@ -319,7 +328,7 @@ export default {
   margin-left: 5px;
 }
 
-@keyframes fromLeft {
+@keyframes NotifyFromLeft {
   from {
     transform: translateX(-100%)
   }
@@ -327,7 +336,7 @@ export default {
     transform: translateX(0%)
   }
 }
-@keyframes fromRight {
+@keyframes NotifyFromRight {
   from {
     transform: translateX(100%)
   }
@@ -335,7 +344,7 @@ export default {
     transform: translateX(0%)
   }
 }
-@keyframes fromTop {
+@keyframes NotifyFromTop {
   from {
     transform: translateY(-100%)
   }
@@ -343,7 +352,7 @@ export default {
     transform: translateY(0%)
   }
 }
-@keyframes fromBottom {
+@keyframes NotifyFromBottom {
   from {
     transform: translateY(100%)
   }
