@@ -36,7 +36,7 @@ export default {
       componentProps: {},
       component: null,
       preventClose: false,
-      treshold: 100,
+      treshold: 50,
       holding: false,
       temp_transition: null,
       timeout_ended: false,

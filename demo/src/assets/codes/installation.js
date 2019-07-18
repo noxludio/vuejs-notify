@@ -15,6 +15,8 @@ Vue.use(VueNotify, {
   title: 'Title', // Default null 
   msg: 'Message', // Default null
   closeOnClick: true, // Default false
+  touch: false, // Default true
+  treshold: 60, // Swipe treshold to close notification. Default 50
   component: MyVueComponent, // Your component will be placed after message and before buttons
   componentProps: {}, // Your component props
   classes: ['my-class'], // Classes for Default preset, gets overwritten by presets
