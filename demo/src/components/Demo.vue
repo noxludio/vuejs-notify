@@ -4,9 +4,9 @@
       <div class="container">
         <div class="d-flex flex-column justify-content-between" style="height:80vh;">
           <div class="d-flex justify-content-between">
-            <button @click="notify1('top left')" class="btn btn-primary mt-2">Notify 'top left'</button>
-            <button @click="notify1('top center')" class="btn btn-primary mt-2">Notify 'top center'</button>
-            <button @click="notify1('top right')" class="btn btn-primary mt-2">Notify 'top right'</button>
+            <button @click="notify1('top left')" class="btn btn-sm btn-outline-primary mt-2">Notify</button>
+            <button @click="notify1('top center')" class="btn btn-sm btn-outline-primary mt-2">Notify</button>
+            <button @click="notify1('top right')" class="btn btn-sm btn-outline-primary mt-2">Notify</button>
           </div>
           <div>
             <h2>vuejs-notify</h2>
@@ -29,9 +29,9 @@
             </div>
           </div>
           <div class="d-flex justify-content-between">
-            <button @click="notify1('bottom left')" class="btn btn-primary mt-2">Notify </button>
-            <button @click="notify1('bottom center')" class="btn btn-primary mt-2">Notify </button>
-            <button @click="notify1('bottom right')" class="btn btn-primary mt-2">Notify </button>
+            <button @click="notify1('bottom left')" class="btn btn-sm btn-outline-primary mt-2">Notify </button>
+            <button @click="notify1('bottom center')" class="btn btn-sm btn-outline-primary mt-2">Notify </button>
+            <button @click="notify1('bottom right')" class="btn btn-sm btn-outline-primary mt-2">Notify </button>
           </div>
         </div>
       </div>
@@ -52,7 +52,6 @@
         <div class="usage py-4">
           <h3 id="usage">Usage</h3>
           <div class="mt-4">
-            <h6>Use with strings</h6>
             <codemirror :value="codes.usage[0]"></codemirror>
           </div>
           <div class="my-3">

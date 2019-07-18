@@ -1,10 +1,13 @@
 module.exports = [
-`// Default presets
+`// Use string, replaces msg
 this.$notify.default('My default message')
 this.$notify.error('My error message')
 this.$notify.warning('My warning message')
 this.$notify.success('My success message')
 this.$notify.info('My info message')
+
+// Or add options
+this.$notify.default({position: 'bottom right', msg:'My default message'})
 
 // Custom presets work exactly the same
 this.$notify.myCustomPreset('My custom preset message')
