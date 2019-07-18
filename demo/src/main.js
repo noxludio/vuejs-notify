@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 
-import VueNotify from '../../index'
+import VueNotify from 'vuejs-notify'
 
 import VueCodemirror from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
@@ -38,12 +38,22 @@ Vue.use(VueNotify,{
         width: '100%'
       },
       component: CookieComponent,
+      componentProps: { msg: 'This page uses cookies. Yummy!' },
       buttons: [
         {
           text: 'Accept & Dismiss',
           click(notify){
             cookies.set('cookiesAccepted','true', {expires:365})
-            notify.close(true)
+
+            // notify.classes = 'success'
+            notify.title = 'Cookies accepted'
+            notify.componentProps.msg = 'Thank you!'
+            notify.buttons[0].classes = 'hide-cookie-button'
+
+            setTimeout(()=>{
+              notify.close(true)
+            }, 1400)
+
           }
         }
       ],
@@ -53,6 +63,7 @@ Vue.use(VueNotify,{
     }
   }
 })
+
 
 new Vue({
   render: function (h) { return h(App) },
