@@ -1,7 +1,7 @@
 {
   "name": "vuejs-notify",
-  "version": "1.0.0",
-  "description": "Vuejs notifications with touch and lots of configurations",
+  "version": "1.0.01",
+  "description": "Vuejs notifications with lots of configurations",
   "github": "https://github.com/noxludio/vuejs-notify",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,7 @@
   "bugs": {
     "url": "https://github.com/noxludio/vuejs-notify/issues"
   },
-  "homepage": "https://github.com/noxludio/vuejs-notify",
+  "homepage": "https://noxludio.github.io/vuejs-notify/",
   "dependencies": {
     "vue-touch": "^2.0.0-beta.4"
   }
