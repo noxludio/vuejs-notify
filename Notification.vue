@@ -30,12 +30,12 @@ export default {
       opacity: 1,
       buttons: [],
       touch: true,
+      closeOnClick: false,
       notifications: [],
       mounted: false,
       componentProps: {},
       component: null,
       preventClose: false,
-      closeOnClick: false,
       treshold: 100,
       holding: false,
       temp_transition: null,
@@ -66,7 +66,7 @@ export default {
       events: {
         'before-close': [],
         'mounted': [],
-        'closed': [],
+        'destroyed': [],
         'click': []
       }
     }
@@ -81,9 +81,6 @@ export default {
         this.buttons.forEach( (btn,index) => { 
           btn.uid = btn.uid || Date.now()+index
           btn[this._uid+'_click'] = (event) => {
-
-            console.log(this._uid+'_click', btn);
-
             (btn.click || function(){}).apply(this, [this, event, btn])
           }
         })
@@ -132,7 +129,7 @@ export default {
         this.temp_transition = this.styles.transition
       }
 
-      this.styles.transition = null
+      this.styles.transition = `${this.ypos} ${this.transition}ms ease`
       this.styles.transform = `translateX(${event.deltaX}px)`
       this.holding = true
       if(event.isFinal) {
@@ -180,12 +177,11 @@ export default {
       })
       
       setTimeout(()=>{
-        this.notifications = this.notifications.filter( item => item._uid != this._uid )
         this.$destroy()
         this.$el.remove();
+        this.fire('destroyed', this)
       },this.transition)
 
-      this.fire('closed', this)
 
       return true
     }
