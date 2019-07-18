@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 
-import VueNotify from 'vuejs-notify'
+import VueNotify from '../../index'
 
 import VueCodemirror from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
