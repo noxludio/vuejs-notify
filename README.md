@@ -1,2 +1,6 @@
-# vue-touch-notify
-Vue notifications plugin with touch support! 
+# vuejs-notify
+Versitile Vue notification plugin
+
+```
+npm i vuejs-notify --save
+```
