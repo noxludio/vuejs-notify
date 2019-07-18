@@ -1,3 +1,5 @@
 module.exports = {
-  assetsDir: 'vuejs-notify'
+  publicPath: process.env.NODE_ENV === 'production'
+  ? '/vuejs-notify/'
+  : '/'
 } 

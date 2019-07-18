@@ -1,6 +1,6 @@
 <template>
 <div class="d-flex p-3 align-items-center">
-  <img src="/vuejs-notify/cookie.svg" alt="" class="cookie">
+  <img src="/vuejs-notify/pictures/cookie.svg" alt="" class="cookie">
   <small class="px-3">{{msg}}</small>
 </div>
 </template>
