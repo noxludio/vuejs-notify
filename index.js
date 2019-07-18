@@ -4,7 +4,7 @@ import Notification from './Notification.vue'
 let container = null
 let defaultOptions = {}
 let notifications  = []
-
+let notifiers = {}
 let presets = {
   default: {},
   warning: {
@@ -22,12 +22,19 @@ let presets = {
 }
 
 let notifyConstructor = function(){}
-let notifier = function(notify){
+function notifier (notify){
   if(!container) {
-    return console.warn("vue-touch-notify was not installed properly. Container was not set.")
+    return console.warn("vuejs-notify was not installed properly. Container was not set.")
   }
   let options = Object.assign({notifications}, defaultOptions)
   const notifyComponent = new notifyConstructor({data: Object.assign(options, notify)}).$mount()
+
+  // remove destroyed from notifications
+  notifyComponent.on('destroyed', function(){
+    notifications = notifications.filter( n => n._uid != notifyComponent._uid )
+  })
+  
+  // remove overflow
   container.appendChild(notifyComponent.$el)
   if(notifications.length > (defaultOptions.max||60)) {
     let overflow = notifications.pop()
@@ -37,9 +44,9 @@ let notifier = function(notify){
   return notifyComponent
 }
 
-let setPreset = function(Vue, name, options) {
+function notifySetPreset (name, options = {}) {
   presets[name] = Object.assign(presets[name]||{}, options)
-  Vue.prototype.$notify[name] = function(notify){
+  notifiers[name] = function(notify){
     let defaults = Object.assign({}, defaultOptions)
     Object.assign(defaults, presets[name])
     const notifyComponent = notifier(Object.assign(defaults, typeof notify === 'string' ? {msg:notify} : notify))
@@ -47,7 +54,25 @@ let setPreset = function(Vue, name, options) {
       notifyComponent.on('mounted', resolve)
     })
   }
+  return notifiers[name]
 }
+
+function notifyCloseAll (forced){
+  return new Promise( (resolve) => {
+    if(notifications.length === 0) resolve(notifications)
+    else {
+      notifications.forEach( (notify, index) => {
+        if(index == notifications.length - 1) {
+          notify.on('destroyed', ()=>resolve(notifications))  
+        }
+        notify.close(forced)
+      })
+    }
+  })
+}
+
+function notifyGetAll () { return notifications }
+function notifyGetPreset (name) { return presets[name] }
 
 export default {
   install(Vue, options = {}) {
@@ -62,28 +87,30 @@ export default {
       delete options.presets
     }
     container = document.createElement('div')
-    container.classList.add('vue-touch-notify-container')
+    container.classList.add('vuejs-notify-container')
     document.body.appendChild(container)
 
     Object.assign(defaultOptions, (options||{}) || {})
 
     notifyConstructor = Vue.extend( Notification )
     
-    Vue.prototype.$notify = {}
-
-    Vue.prototype.$notifyPreset = function(name, options){
-      setPreset(Vue,name,options||{})
-      return this
-    }
-    Vue.prototype.$getNotifyPresets = function(){
-      return presets
-    }
+    Vue.prototype.$notify = notifiers
+    Vue.prototype.$notifySetPreset = notifySetPreset
+    Vue.prototype.$notifyGetPreset = notifyGetPreset
 
     for (const name in presets) {
-      if (presets.hasOwnProperty(name)) setPreset(Vue, name)
+      if (presets.hasOwnProperty(name)) notifySetPreset(name)
     }
+    Vue.prototype.$notifyGetAll = notifyGetAll
+    Vue.prototype.$notifyCloseAll = notifyCloseAll
 
   }
 }
 
-export { notify }
+export {
+  notifiers as notify,
+  notifyGetAll,
+  notifyCloseAll,
+  notifySetPreset,
+  notifyGetPresets
+}
