@@ -2,27 +2,22 @@
 module.exports = [
 `import Vue from 'vue'
 import VueNotify from 'vuejs-notify'
-Vue.use(VueNotify)
-
-// Then in component
-this.$notify.default('My default message') // String or Object wihth configurations
-this.$notify.error('My error message')
-this.$notify.warning('My warning message')
-this.$notify.success('My success message')
-this.$notify.info('My info message')`,
+Vue.use(VueNotify)`,
 `// All configurations are optional
 Vue.use(VueNotify, {
+  max: 100, // Default 60
   timeout: 0, // In milliseconds, 0 for never. Default is 6000,
   position: 'bottom center', // 'bottom left', 'bottom right', 'top left', 'top center', 'top right',
   transition: 450, // Animation speed. Default 330
-  marginY: 10, // spacing between notifications 
-  marginX: 20, // margin on x axis. Used only on left/right alignments
-  opacity: 0.95, // default 1 
-  title: 'Title', // default null 
-  msg: 'Message', // default null
+  marginY: 10, // Spacing between notifications 
+  marginX: 20, // Margin on x axis. Used only on left/right alignments
+  opacity: 0.95, // Default 1 
+  title: 'Title', // Default null 
+  msg: 'Message', // Default null
+  closeOnClick: true, // Default false
   component: MyVueComponent, // Your component will be placed after message and before buttons
-  componentProps: {}, // default null
-  classes: 'my-class', // Array, object or string 
+  componentProps: {}, // Your component props
+  classes: ['my-class'], // Classes for Default preset, gets overwritten by presets
   styles: { // these are binded to vue notification
     // Number values get 'px' postfix (except opacity)
     minWidth: null, // default 250
@@ -38,17 +33,19 @@ Vue.use(VueNotify, {
     }
   ],
   events: {
+    // Array of functions
+    // First argument is always the notification component
     'before-close': [
-      function(notify) {
+      function(notify) { 
         // preventClose is checked on close function and reset to false after prevented
         // it can only be used synchronoushly
         notify.preventClose = true
         // to force close use 'close(true)'
       }
     ],
-    'closed': [], // fires after successful close
-    'mounted': [], // fires after mount
-    'click': [] // fires when notify is clicked
+    'destroyed': [], // Fired after destroyed
+    'mounted': [], // Fired after mount
+    'click': [] // Fired when notify is clicked. Second argument is click event
   },
   appear: { // Appear animations
     'top left':'NotifyFromLeft',
@@ -58,10 +55,12 @@ Vue.use(VueNotify, {
     'bottom right':'NotifyFromRight',
     'bottom center':'NotifyFromBottom',
   },
-  presets: { // configure presets
+  // pre-configure presets
+  presets: {
     // presets use default configurations as their base
     error: { // default presets are 'error', 'warning', 'success', 'info'
-      title: 'Error!'
+      title: 'Error!',
+      classes: ['my-error'] // default ['error']
     },
     cookie: { // add custom presets
       component: CookieComponent,
