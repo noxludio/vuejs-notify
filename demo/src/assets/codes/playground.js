@@ -2,9 +2,9 @@ module.exports = [
 `// Overwrite presets with an object
 this.$notify.success({
   position: 'bottom right',
-  closeOnClick: true,
+  timeout: 0,
   title: 'Success!',
-  msg: 'You did something right',
+  msg: 'You did something right. Swipe to close',
 })`,
 `// Set states after notified
 this.$notify.default({

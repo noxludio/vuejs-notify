@@ -12,7 +12,7 @@
             <h2>vuejs-notify</h2>
             <div>
             <small>
-              <p>Highly versitile Vue notifications plugin</p>
+              <p>Simple Vue notifications plugin</p>
               <a href="https://github.com/noxludio/vuejs-notify" target="_blank" class="mr-2">Github</a>
               <a href="https://www.npmjs.com/package/vuejs-notify" target="_blank">NPM</a>
             </small>
@@ -20,13 +20,13 @@
             <div class="p-3">
               <code>npm i vuejs-notify --save</code>
             </div>
-            <div class="mt-3">
+            <!-- <div class="mt-3">
               <div>
                 <small>Close notifications</small>
               </div>
               <button title='$notifyCloseAll()' class="btn btn-sm btn-outline-primary mr-2" @click='$notifyCloseAll()'>Close all</button>
               <button title='$notifyCloseAll(true)' class="btn btn-sm btn-outline-secondary" @click='$notifyCloseAll(true)'>Force close all</button>
-            </div>
+            </div> -->
           </div>
           <div class="d-flex justify-content-between">
             <button @click="notify1('bottom left')" class="btn btn-sm btn-outline-primary mt-2">Notify </button>
@@ -38,6 +38,22 @@
     </div>
     <div class="demos">
       <div class="container">
+        <div class="playground py-4">
+          <h3 id="usage">Playground</h3>
+          <p>
+            <small>Select demo below, edit and hit run</small>
+          </p>
+          <select name="playgroundSelect" id="playgroundSelect" v-model='currentPlayground' class="form-control form-control-sm">
+            <option :value="0">Using objects</option>
+            <option :value="1">Set states after notified</option>
+            <option :value="2">Set event</option>
+            <option :value="3">Custom notifier</option>
+          </select>
+          <codemirror v-model='codes.playground[currentPlayground]'></codemirror>
+          <div class="my-3">
+            <button class='mr-1 btn btn-sm btn-outline-primary' @click='runPlayground'>Run!</button>
+          </div>
+        </div>
         <div class="installation py-4">
           <h3 id="installation">Installation</h3>
           <div class="mt-4">
@@ -64,22 +80,6 @@
           <div class="mt-4">
             <h6>Other functions</h6>
             <codemirror :value='codes.usage[1]'></codemirror>
-          </div>
-        </div>
-        <div class="playground py-4">
-          <h3 id="usage">Playground</h3>
-          <p>
-            <small>Select demo below, edit and hit run</small>
-          </p>
-          <select name="playgroundSelect" id="playgroundSelect" v-model='currentPlayground' class="form-control form-control-sm">
-            <option :value="0">Using objects</option>
-            <option :value="1">Set states after notified</option>
-            <option :value="2">Set event</option>
-            <option :value="3">Custom notifier</option>
-          </select>
-          <codemirror v-model='codes.playground[currentPlayground]'></codemirror>
-          <div class="my-3">
-            <button class='mr-1 btn btn-sm btn-outline-primary' @click='runPlayground'>Run!</button>
           </div>
         </div>
       </div>
@@ -118,8 +118,8 @@ export default {
 
       let test = {
         position,
-        msg: "To be able to close this you need to do it 'Do it'",
-        timeout: 0,
+        title: 'Title goes here',
+        msg: 'Your message goes here. Swipe to close.',
         marginY: 10,
         opacity: 0.95,
         styles: {
@@ -127,34 +127,10 @@ export default {
           maxWidth: 'calc(100% - 40px)',
           width: 250
         },
-        buttons: [
-          { text: "Do it" ,
-            click:(notify)=>{
-              notify.classes = 'success'
-              notify.msg = 'Nice! Now you can close this notification'
-              notify.buttons = [{
-                text: "Close",
-                click(){
-                  notify.close(true)
-                }
-              }]
-            }
-          },
-        ],
-        events: {
-          'before-close': [
-            notify=>{
-              if(notify.classes!='success') notify.preventClose=true
-            }
-          ]
-        }
+        buttons: []
       }
+
       this.$notify.default(test)
-      // this.$notify.default(test).then( notify => {
-      //   notify.on("before-close", function(){
-      //     if(this.classes != 'success') this.preventClose = true
-      //   })
-      // })
 
     }
   },
