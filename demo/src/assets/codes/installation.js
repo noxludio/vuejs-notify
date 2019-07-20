@@ -26,6 +26,14 @@ Vue.use(VueNotify, {
     maxWidth: 'calc(100% - 40px)', // default 350
     width: 250 // default null
   },
+  appear: { // Appear animations
+    'top left':'NotifyFromLeft',
+    'top right':'NotifyFromRight',
+    'top center':'NotifyFromTop',
+    'bottom left':'NotifyFromLeft',
+    'bottom right':'NotifyFromRight',
+    'bottom center':'NotifyFromBottom',
+  },
   buttons: [
     {
       html: '<i class="material-icons">face</i>', // Use for icons or what ever
@@ -34,6 +42,14 @@ Vue.use(VueNotify, {
       classes: 'my-button-class' // Array, object or string
     }
   ],
+  // pre-configure presets
+  presets: {
+    // presets use default configurations as their base
+    error: { // default presets are 'error', 'warning', 'success', 'info'
+      title: 'Error!',
+      classes: ['my-error'] // default ['error']
+    }
+  },
   events: {
     // Array of functions
     // First argument is always the notification component
@@ -48,35 +64,6 @@ Vue.use(VueNotify, {
     'destroyed': [], // Fired after destroyed
     'mounted': [], // Fired after mount
     'click': [] // Fired when notify is clicked. Second argument is click event
-  },
-  appear: { // Appear animations
-    'top left':'NotifyFromLeft',
-    'top right':'NotifyFromRight',
-    'top center':'NotifyFromTop',
-    'bottom left':'NotifyFromLeft',
-    'bottom right':'NotifyFromRight',
-    'bottom center':'NotifyFromBottom',
-  },
-  // pre-configure presets
-  presets: {
-    // presets use default configurations as their base
-    error: { // default presets are 'error', 'warning', 'success', 'info'
-      title: 'Error!',
-      classes: ['my-error'] // default ['error']
-    },
-    cookie: { // add custom presets
-      component: CookieComponent,
-      buttons: [{
-        text: 'Accept & Dismiss',
-        click(notify){
-          // ... set cookies and close
-          notify.close(true) 
-        }
-      }],
-      events: {
-        'before-close': [ notify => notify.preventClose = true ]
-      }
-    }
   }
 })`
 ]
