@@ -190,6 +190,9 @@ export default {
     this.styles.transition = `all ${this.transition}ms ease, left 0s`
     this.styles.opacity = 0
     this.mounted = true;
+    
+    console.log(this,this._uid);
+
     this.$nextTick( () => {
       this.fire('mounted', this)
       this.styles.opacity = this.opacity
@@ -202,6 +205,7 @@ export default {
         .forEach( item => {
           item.styles[this.ypos] += this.$el.clientHeight + this.marginY
       })
+
       this.notifications.unshift(this)
     })
 

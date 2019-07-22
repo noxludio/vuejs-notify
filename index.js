@@ -1,6 +1,8 @@
 import VueTouch from 'vue-touch'
 import Notification from './Notification.vue'
 
+var cloneDeep = require('lodash.clonedeep');
+
 let container = null
 let defaultOptions = {}
 let notifications  = []
@@ -26,8 +28,11 @@ function notifier (notify){
   if(!container) {
     return console.warn("vuejs-notify was not installed properly. Container was not set.")
   }
-  let options = Object.assign({notifications}, defaultOptions)
-  const notifyComponent = new notifyConstructor({data: Object.assign(options, notify)}).$mount()
+  
+  let data = cloneDeep(Object.assign(defaultOptions, notify))
+  data.notifications = notifications
+
+  const notifyComponent = new notifyConstructor({data}).$mount()
 
   // remove destroyed from notifications
   notifyComponent.on('destroyed', function(){

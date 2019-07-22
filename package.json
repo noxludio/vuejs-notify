@@ -1,6 +1,6 @@
 {
   "name": "vuejs-notify",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "Vuejs notifications with lots of configurations",
   "github": "https://github.com/noxludio/vuejs-notify",
   "main": "index.js",
@@ -14,6 +14,7 @@
   },
   "homepage": "https://noxludio.github.io/vuejs-notify/",
   "dependencies": {
+    "lodash.clonedeep": "^4.5.0",
     "vue-touch": "^2.0.0-beta.4"
   }
 }
