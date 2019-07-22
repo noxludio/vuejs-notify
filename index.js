@@ -29,7 +29,7 @@ function notifier (notify){
     return console.warn("vuejs-notify was not installed properly. Container was not set.")
   }
   
-  let data = cloneDeep(Object.assign(defaultOptions, notify))
+  let data = cloneDeep(Object.assign(notify, defaultOptions))
   data.notifications = notifications
 
   const notifyComponent = new notifyConstructor({data}).$mount()
