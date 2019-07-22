@@ -129,7 +129,7 @@ export default {
         this.temp_transition = this.styles.transition
       }
 
-      this.styles.transition = `${this.ypos} ${this.transition}ms ease`
+      this.styles.transition = `transform 55ms ease, ${this.ypos} ${this.transition}ms ease`
       this.styles.transform = `translateX(${event.deltaX}px)`
       this.holding = true
       if(event.isFinal) {

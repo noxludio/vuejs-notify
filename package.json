@@ -1,6 +1,6 @@
 {
   "name": "vuejs-notify",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "Vuejs notifications with lots of configurations",
   "github": "https://github.com/noxludio/vuejs-notify",
   "main": "index.js",
