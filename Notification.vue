@@ -36,7 +36,7 @@ export default {
       componentProps: {},
       component: null,
       preventClose: false,
-      treshold: 50,
+      treshold: 90,
       holding: false,
       temp_transition: null,
       timeout_ended: false,
@@ -129,15 +129,18 @@ export default {
         this.temp_transition = this.styles.transition
       }
 
-      this.styles.transition = `transform 55ms ease, ${this.ypos} ${this.transition}ms ease`
+      this.styles.transition = `transform 55ms ease, ${this.ypos} ${this.transition}ms ease, opacity 400ms ease`
       this.styles.transform = `translateX(${event.deltaX}px)`
+
+      let overTreshold = Math.abs(event.deltaX) > this.treshold
+      this.styles.opacity = overTreshold ? 0.5 : this.opacity
       this.holding = true
       if(event.isFinal) {
         this.holding = false
         this.styles.transition = this.temp_transition
         this.temp_transition = null
         if(this.timeout_ended) this.close()
-        if(Math.abs(event.deltaX) > this.treshold) {
+        if(overTreshold) {
           let target = event.deltaX + (event.deltaX > 0 ? 100 : -100)
           this.styles.transform = `translateX(${(this.close() ? target : 0)}px)`
         } else {
